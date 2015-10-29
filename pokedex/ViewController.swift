@@ -31,26 +31,26 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.Done
         
-        initAudio()
+//        initAudio()
         parsePokemonCSV()
     
     }
     
-    func initAudio() {
-        
-        let path = NSBundle.mainBundle().pathForResource("music", ofType: "mp3")!
-        
-        do {
-            musicPlayer = try AVAudioPlayer(contentsOfURL: NSURL(string: path)!)
-            musicPlayer.prepareToPlay()
-            musicPlayer.numberOfLoops = -1
-            musicPlayer.play()
-        } catch let err as NSError {
-            print(err.debugDescription)
-        }
-        
-    }
-    
+//    func initAudio() {
+//        
+//        let path = NSBundle.mainBundle().pathForResource("music", ofType: "mp3")!
+//        
+//        do {
+//            musicPlayer = try AVAudioPlayer(contentsOfURL: NSURL(string: path)!)
+//            musicPlayer.prepareToPlay()
+//            musicPlayer.numberOfLoops = -1
+//            musicPlayer.play()
+//        } catch let err as NSError {
+//            print(err.debugDescription)
+//        }
+//        
+//    }
+//    
     
     func parsePokemonCSV() {
      
@@ -58,7 +58,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         do {
             let csv = try CSV(contentsOfURL: path)
             let rows = csv.rows
-            print(rows)
+//            print(rows)
             
             for row in rows {
             
@@ -101,14 +101,23 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         
+        let poke: Pokemon!
         
+        if inSearchMode {
+            poke = filteredPokemon[indexPath.row]
+        } else {
+            poke = pokemon[indexPath.row]
+        }
+//        print(poke.name)
+        
+        performSegueWithIdentifier("PokemonDetailVC", sender: poke)
     }
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if inSearchMode {
             return filteredPokemon.count
-        } else {
-        return pokemon.count
         }
+        return pokemon.count
+      
     }
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
@@ -122,18 +131,18 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     
-    @IBAction func musicBtnPressed(sender: UIButton!) {
-        
-        if musicPlayer.playing  {
-            musicPlayer.stop()
-            sender.alpha = 0.2
-            
-        } else {
-            musicPlayer.play()
-            sender.alpha = 1.0
-        }
-        
-    }
+//    @IBAction func musicBtnPressed(sender: UIButton!) {
+//        
+//        if musicPlayer.playing  {
+//            musicPlayer.stop()
+//            sender.alpha = 0.2
+//            
+//        } else {
+//            musicPlayer.play()
+//            sender.alpha = 1.0
+//        }
+//        
+//    }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         view.endEditing(true)
@@ -151,6 +160,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             collection.reloadData()
         }
         
+    }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "PokemonDetailVC" {
+            if let detailsVC = segue.destinationViewController as? PokemonDetailVC {
+                if let poke = sender as? Pokemon {
+                    detailsVC.pokemon = poke
+                }
+            }
+        }
     }
     
 }
